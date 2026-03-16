@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../App.css";
 
 const ProductList = ({ properties, onDeleteProperty, onContactOwner }) => {
@@ -12,30 +13,29 @@ const ProductList = ({ properties, onDeleteProperty, onContactOwner }) => {
   return (
     <div>
 
-      {/* Search Bar */}
-
-      <div style={{ textAlign: "center", margin: "20px" }}>
+      <div className="search-bar">
         <input
           type="text"
-          placeholder="Search by location..."
+          placeholder="Search by location"
           value={searchLocation}
           onChange={(e) => setSearchLocation(e.target.value)}
-          style={{ padding: "10px", width: "250px" }}
         />
       </div>
 
-      {/* Property List */}
-
       <div className="property-list">
 
-        {filteredProperties.length === 0 ? (
-          <h3>No properties found</h3>
-        ) : (
-          filteredProperties.map((property) => (
+        {filteredProperties.map((property) => (
 
-            <div key={property._id} className="property-card">
+          <Link
+            to={`/property/${property._id}`}
+            key={property._id}
+            style={{ textDecoration: "none", color: "black" }}
+          >
 
-              <img src={property.image} alt={property.title} />
+            <div className="property-card">
+
+              <img  src={`http://localhost:8080${property.image}`}
+  alt={property.title}/>
 
               <h3>{property.title}</h3>
 
@@ -45,25 +45,14 @@ const ProductList = ({ properties, onDeleteProperty, onContactOwner }) => {
 
               <p><strong>Price:</strong> ₹{property.price}</p>
 
-              <button
-                onClick={() => onContactOwner(property.contact)}
-              >
-                Contact Owner
-              </button>
-
-              <button
-                className="delete-btn"
-                onClick={() => onDeleteProperty(property._id)}
-              >
-                Delete
-              </button>
-
             </div>
 
-          ))
-        )}
+          </Link>
+
+        ))}
 
       </div>
+
     </div>
   );
 };

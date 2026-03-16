@@ -3,42 +3,44 @@ import axios from "axios";
 
 const AddProperty = ({ onAddProperty }) => {
 
-  const [newProperty, setNewProperty] = useState({
+  const [formData, setFormData] = useState({
     title: "",
     description: "",
-    image: "",
     contact: "",
     price: "",
     location: ""
   });
 
+  const [image, setImage] = useState(null);
+
   const handleChange = (e) => {
-    setNewProperty({
-      ...newProperty,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value
     });
   };
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+
+    const data = new FormData();
+
+    data.append("title", formData.title);
+    data.append("description", formData.description);
+    data.append("contact", formData.contact);
+    data.append("price", formData.price);
+    data.append("location", formData.location);
+    data.append("image", image);
 
     try {
 
       const response = await axios.post(
         "http://localhost:8080/api/properties",
-        newProperty
+        data
       );
 
       onAddProperty(response.data);
-
-      setNewProperty({
-        title: "",
-        description: "",
-        image: "",
-        contact: "",
-        price: "",
-        location: ""
-      });
 
     } catch (error) {
       console.error(error);
@@ -46,47 +48,61 @@ const AddProperty = ({ onAddProperty }) => {
   };
 
   return (
+
     <div className="form-container">
 
       <h2>Add Property</h2>
 
       <form onSubmit={handleSubmit}>
 
-        <div className="form-row">
-          <label>Title</label>
-          <input name="title" value={newProperty.title} onChange={handleChange} required />
-        </div>
+        <input
+          name="title"
+          placeholder="Title"
+          onChange={handleChange}
+          required
+        />
 
-        <div className="form-row">
-          <label>Description</label>
-          <input name="description" value={newProperty.description} onChange={handleChange} required />
-        </div>
+        <input
+          name="description"
+          placeholder="Description"
+          onChange={handleChange}
+          required
+        />
 
-        <div className="form-row">
-          <label>Image URL</label>
-          <input name="image" value={newProperty.image} onChange={handleChange} required />
-        </div>
+        <input
+          name="location"
+          placeholder="Location"
+          onChange={handleChange}
+          required
+        />
 
-        <div className="form-row">
-          <label>Contact</label>
-          <input name="contact" value={newProperty.contact} onChange={handleChange} required />
-        </div>
+        <input
+          name="price"
+          type="number"
+          placeholder="Price"
+          onChange={handleChange}
+          required
+        />
 
-        <div className="form-row">
-          <label>Price</label>
-          <input type="number" name="price" value={newProperty.price} onChange={handleChange} required />
-        </div>
+        <input
+          name="contact"
+          placeholder="Contact"
+          onChange={handleChange}
+          required
+        />
 
-        <div className="form-row">
-          <label>Location</label>
-          <input name="location" value={newProperty.location} onChange={handleChange} required />
-        </div>
+        <input
+          type="file"
+          onChange={(e) => setImage(e.target.files[0])}
+          required
+        />
 
         <button type="submit">Add Property</button>
 
       </form>
 
     </div>
+
   );
 };
 

@@ -2,63 +2,78 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AddProperty from "./components/AddProperty";
 import ProductList from "./components/ProductList";
+import PropertyDetails from "./components/PropertyDetails";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 
 const App = () => {
+
   const [properties, setProperties] = useState([]);
 
-  // Fetch properties when app loads
   useEffect(() => {
     axios
       .get("http://localhost:8080/api/properties")
-      .then((response) => {
-        setProperties(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching properties:", error);
-      });
+      .then((res) => setProperties(res.data))
+      .catch((err) => console.error(err));
   }, []);
 
-  // Add property to state
   const handleAddProperty = (newProperty) => {
-    setProperties((prevProperties) => [...prevProperties, newProperty]);
+    setProperties((prev) => [...prev, newProperty]);
   };
 
-  // Contact owner
   const handleContactOwner = (contact) => {
-    alert(`Contact the owner at: ${contact}`);
+    alert(`Contact Owner: ${contact}`);
   };
 
-  // Delete property
-  const handleDeleteProperty = async (propertyId) => {
+  const handleDeleteProperty = async (id) => {
+
     try {
-      await axios.delete(
-        `http://localhost:8080/api/properties/${propertyId}`
+      await axios.delete(`http://localhost:8080/api/properties/${id}`);
+
+      setProperties((prev) =>
+        prev.filter((property) => property._id !== id)
       );
 
-      setProperties((prevProperties) =>
-        prevProperties.filter(
-          (property) => property._id !== propertyId
-        )
-      );
     } catch (error) {
-      console.error("Error deleting property:", error);
+      console.error(error);
     }
   };
 
   return (
-    <div className="container">
-      <h1 className="gfg">GFG</h1>
-      <h1>Real Estate Management</h1>
 
-      <AddProperty onAddProperty={handleAddProperty} />
+    <Router>
 
-      <ProductList
-        properties={properties}
-        onDeleteProperty={handleDeleteProperty}
-        onContactOwner={handleContactOwner}
-      />
-    </div>
+      <div className="container">
+
+        <h1 className="gfg">Real Estate App</h1>
+
+        <Routes>
+
+          <Route
+            path="/"
+            element={
+              <>
+                <AddProperty onAddProperty={handleAddProperty} />
+
+                <ProductList
+                  properties={properties}
+                  onDeleteProperty={handleDeleteProperty}
+                  onContactOwner={handleContactOwner}
+                />
+              </>
+            }
+          />
+
+          <Route
+            path="/property/:id"
+            element={<PropertyDetails />}
+          />
+
+        </Routes>
+
+      </div>
+
+    </Router>
   );
 };
 
