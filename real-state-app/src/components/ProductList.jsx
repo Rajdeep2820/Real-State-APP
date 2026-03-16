@@ -1,44 +1,70 @@
-import React from "react";
+import React, { useState } from "react";
 import "../App.css";
 
 const ProductList = ({ properties, onDeleteProperty, onContactOwner }) => {
+
+  const [searchLocation, setSearchLocation] = useState("");
+
+  const filteredProperties = properties.filter((property) =>
+    property.location.toLowerCase().includes(searchLocation.toLowerCase())
+  );
+
   return (
+    <div>
 
-    <div className="property-list">
+      {/* Search Bar */}
 
-      {properties.map((property) => (
+      <div style={{ textAlign: "center", margin: "20px" }}>
+        <input
+          type="text"
+          placeholder="Search by location..."
+          value={searchLocation}
+          onChange={(e) => setSearchLocation(e.target.value)}
+          style={{ padding: "10px", width: "250px" }}
+        />
+      </div>
 
-        <div key={property._id} className="property-card">
+      {/* Property List */}
 
-          <img src={property.image} alt={property.title} />
+      <div className="property-list">
 
-          <h3>{property.title}</h3>
+        {filteredProperties.length === 0 ? (
+          <h3>No properties found</h3>
+        ) : (
+          filteredProperties.map((property) => (
 
-          <p>{property.description}</p>
+            <div key={property._id} className="property-card">
 
-          <p><strong>Location:</strong> {property.location}</p>
+              <img src={property.image} alt={property.title} />
 
-          <p><strong>Price:</strong> ₹{property.price}</p>
+              <h3>{property.title}</h3>
 
-          <button
-            onClick={() => onContactOwner(property.contact)}
-          >
-            Contact Owner
-          </button>
+              <p>{property.description}</p>
 
-          <button
-            className="delete-btn"
-            onClick={() => onDeleteProperty(property._id)}
-          >
-            Delete
-          </button>
+              <p><strong>Location:</strong> {property.location}</p>
 
-        </div>
+              <p><strong>Price:</strong> ₹{property.price}</p>
 
-      ))}
+              <button
+                onClick={() => onContactOwner(property.contact)}
+              >
+                Contact Owner
+              </button>
 
+              <button
+                className="delete-btn"
+                onClick={() => onDeleteProperty(property._id)}
+              >
+                Delete
+              </button>
+
+            </div>
+
+          ))
+        )}
+
+      </div>
     </div>
-
   );
 };
 
