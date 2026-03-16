@@ -1,35 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import AddProperty from "./components/AddProperty";
+import ProductList from "./components/ProductList";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [properties, setProperties] = useState([]);
+
+  // Fetch properties when app loads
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/properties")
+      .then((response) => {
+        setProperties(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching properties:", error);
+      });
+  }, []);
+
+  // Add property to state
+  const handleAddProperty = (newProperty) => {
+    setProperties((prevProperties) => [...prevProperties, newProperty]);
+  };
+
+  // Contact owner
+  const handleContactOwner = (contact) => {
+    alert(`Contact the owner at: ${contact}`);
+  };
+
+  // Delete property
+  const handleDeleteProperty = async (propertyId) => {
+    try {
+      await axios.delete(
+        `http://localhost:8080/api/properties/${propertyId}`
+      );
+
+      setProperties((prevProperties) =>
+        prevProperties.filter(
+          (property) => property._id !== propertyId
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting property:", error);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="container">
+      <h1 className="gfg">GFG</h1>
+      <h1>Real Estate Management</h1>
 
-export default App
+      <AddProperty onAddProperty={handleAddProperty} />
+
+      <ProductList
+        properties={properties}
+        onDeleteProperty={handleDeleteProperty}
+        onContactOwner={handleContactOwner}
+      />
+    </div>
+  );
+};
+
+export default App;
